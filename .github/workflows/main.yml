@@ -53,11 +53,14 @@ jobs:
     
       # Install python and book build dependencies
       - name: Set up Micromamba
-        uses: mamba-org/provision-with-micromamba@main
+        uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: ./PAD-book/build-environment.yml
           environment-name: JBookEnv
-          cache-env: true
+          # Avoid zsh surprises + don't rely on shell init
+          init-shell: none
+          cache-environment: true
+          cache-downloads: true
 
       # Deletes all notebooks that are not of type TUTORIAL and are not of type LECTURA
       # Removes all markdown files that are not the book intro
@@ -68,9 +71,9 @@ jobs:
 
       # Build the book, requires bash to initialize autorun scripts for mamba, hence bash -l {0}
       - name: Build the book
-        shell: bash -l {0}
         run: |
           jupyter-book build --all ./PAD-book
+        shell: micromamba-shell {0}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
